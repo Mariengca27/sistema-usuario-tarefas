@@ -25,28 +25,48 @@ namespace SistemaDeTarefas.Repositorios
         }
 
 
-
-
         public async Task<UsuarioModel> AdicionarUsuario(UsuarioModel usuario)
         {
-           _dbContext.Usuarios.Add(usuario);
-            _dbContext.SaveChanges();
+          await _dbContext.Usuarios.AddAsync(usuario);
+          await  _dbContext.SaveChangesAsync();
 
                return usuario;
 
         }
-    }
 
-        public Task<bool> Apagar(int id)
+    public async Task<UsuarioModel> Atualizar(UsuarioModel usuario, int id)
+    {
+        UsuarioModel usuarioPorId = await BuscarPorId(id);
+            if (usuarioPorId == null) { 
+                throw new Exception($"USUÁRIO PARA O ID:{id} NÃO FOI ENCONTRADO NO BANCO DE DADOS"); }
+            else { 
+                
+                usuarioPorId.Name = usuario.Name;
+                usuarioPorId.Email = usuario.Email;
+
+                _dbContext.Usuarios.Update(usuarioPorId);
+               await _dbContext.SaveChangesAsync();
+                return usuarioPorId;
+            }
+
+            }
+
+    public async Task<bool> Apagar(int id)
         {
-            throw new NotImplementedException();
+            UsuarioModel usuarioPorId = await BuscarPorId(id);
+            if (usuarioPorId == null)
+            {
+                throw new Exception($"USUÁRIO PARA O ID:{id} NÃO FOI ENCONTRADO NO BANCO DE DADOS");
+            }
+            else
+            {
+                _dbContext.Usuarios.Remove(usuarioPorId);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
         }
 
-        public Task<UsuarioModel> Atualizar(UsuarioModel usuario, int id)
-        {
-            throw new NotImplementedException();
-        }
-
-     
     }
-}
+        
+    }
+
